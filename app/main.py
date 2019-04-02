@@ -5,12 +5,25 @@ import bottle
 
 from api import ping_response, start_response, move_response, end_response
 
+counter = 0
+FRUITS_VALUE = 1
+OTHER_SNAKE_VALUE = -1
 @bottle.route('/')
 def index():
     return '''
     Battlesnake documentation can be found at
        <a href="https://docs.battlesnake.io">https://docs.battlesnake.io</a>.
     '''
+
+def init(data):
+    w, h = data[u'board'][u'width'],data[u'board'][u'height']
+    boardData = [[0 for x in range(w)] for y in range(h)]
+    for fruits in data[u'board'][u'food']:
+        boardData[fruits[u'y']][fruits[u'x']] = FRUITS_VALUE
+    for snakes in data[u'board'][u'snakes']:
+        for body_pieces in snakes[u'body']:
+            boardData[body_pieces[u'y']][body_pieces[u'x']] = OTHER_SNAKE_VALUE
+    return data
 
 @bottle.route('/static/<path:path>')
 def static(path):
@@ -34,29 +47,38 @@ def ping():
 def start():
     data = bottle.request.json
 
+
     """
     TODO: If you intend to have a stateful snake AI,
             initialize your snake state here using the
             request's data if necessary.
     """
-    print(json.dumps(data))
+    #print(json.dumps(data))
 
     color = "#00FF00"
 
     return start_response(color)
 
-
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-
     """
     TODO: Using the data from the endpoint request object, your
             snake AI must choose a direction to move in.
     """
     print(json.dumps(data))
+    grid = init(data)
+    global counter
+    counter += 1
+    if counter % 4 == 0:
+        directions = ['up']
+    elif counter % 4 == 1:
+        directions = ['left']
+    elif counter % 4 == 2:
+        directions = ['down']
+    elif counter % 4 == 3:
+        directions = ['right']
 
-    directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
 
     return move_response(direction)
@@ -78,6 +100,7 @@ def end():
 application = bottle.default_app()
 
 if __name__ == '__main__':
+    c = 0
     bottle.run(
         application,
         host=os.getenv('IP', '0.0.0.0'),
