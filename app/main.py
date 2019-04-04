@@ -135,13 +135,17 @@ def getPreferedDirection(neighborshood):
     bottomValue =  np.mean(bottom)
     print("top:" + str(topValue) + "left:" + str(leftValue) + "right:" + str(rightValue) + "bottom:" + str(bottomValue))
     if topValue >= leftValue and topValue >= rightValue and topValue >= bottomValue :
+        print('up')
         return 'up'
     elif leftValue >= topValue and leftValue >= rightValue and leftValue >= bottomValue :
+        print('left')
         return 'left'
     elif rightValue >= topValue and rightValue >= leftValue and rightValue >= bottomValue :
+        print('right')
         return 'right'
     else:
-        return 'bottom'
+        print('down')
+        return 'down'
 
 
 
@@ -178,7 +182,7 @@ def move():
     #     directions = ['right']
 
 
-    return direction
+    return {"move": direction}
 
 
 @bottle.post('/end')
